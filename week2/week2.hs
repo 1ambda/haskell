@@ -36,10 +36,10 @@ not :: Bool -> Bool
 not False = True
 not True = False
 
-(&&) :: Bool -> Bool -> Bool
+-- (&&) :: Bool -> Bool -> Bool
 
-True && True = True
-_ && _ = False
+-- True && True = True
+-- _ && _ = False
 
 head1 (x : _) = x
 tail1 (_ : xs) = xs
