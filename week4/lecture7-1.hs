@@ -1,7 +1,6 @@
 module Lecture7 where
 
-
-import Prelude hiding (return)
+import Prelude hiding (return, (>>=))
 
 type Parser a = String -> [(a, String)]
 
@@ -24,18 +23,12 @@ p +++ q = \xs -> case p xs of
                   [] -> []
                   [(y, ys)] -> [(y, ys)]
 
--- then
+-- bind 
 (>>=) :: Parser a -> (a -> Parser b) -> Parser b
 p >>= q = \xs -> case parse p xs of
                   [] -> []
                   [(y, ys)] -> parse (q y) ys
 
-p :: Parser (Char, Char)
-p = do x <- item
-       item
-       y <- item
-       return (x, y)
 
--- sat :: (Char -> Bool) -> Parser Char
--- sat p =  do x <- item
---             if p x then Lecture7.return x else failure
+ignore2 :: Parser (Char, Char)
+ignore2 = item >>= \x -> item >>= \y -> item >>= \z -> return (x, z)
