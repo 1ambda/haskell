@@ -6,4 +6,5 @@ Introduction to Functional Programming using **Haskell**
 [Chapter 2](http://1ambda.github.io/haskell-intro2)  
 [Chapter 3](http://1ambda.github.io/haskell-intro3)  
 [Chapter 4](http://1ambda.github.io/haskell-intro4)  
+[Chapter 5](http://1ambda.github.io/haskell-intro5)  
 
