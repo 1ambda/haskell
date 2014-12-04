@@ -9,3 +9,4 @@ Introduction to Functional Programming using **Haskell**
 [Chapter 5](http://1ambda.github.io/haskell-intro5) - IO Monad  
 [Chapter 6](http://1ambda.github.io/haskell-intro6) - Type and Class  
 [Chapter 7](http://1ambda.github.io/haskell-intro7) - The Countdown Problem  
+[Chapter 8](http://1ambda.github.io/haskell-intro7) - Lazy Evaluation, Strict  
