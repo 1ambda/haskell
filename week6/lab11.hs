@@ -34,20 +34,22 @@ instance Show Action where
     show (Fork x y) = "fork " ++ show x ++ " " ++ show y
     show Stop = "stop"
 
--- ===================================
--- Ex. 0
--- ===================================
+{-Ex. 0
+To express the connection between an expression of type Concurrent a and one of type Action,
+we define a function
+
+action :: Concurrent a -> Action that transforms a ((a -> Action) -> Action)
+
+into an Action that uses Stop :: Action to create the continuation to the Concurrent
+a passed as the first argument to action.
+-}
 
 -- action' :: ((a -> Action) -> Action) -> Action
--- action' c =  
+-- action' = \a -> Stop
 
 action :: Concurrent a -> Action
-action =  error "You have to implement action"
+action cont = \a -> cont a
 
-{- test
-ex0 :: Concurrent ()
-ex0 = par (loop (genRandom 1337)) (loop (genRandom 2600) >> atom (putStrLn ""))
--}
 
 -- ===================================
 -- Ex. 1
