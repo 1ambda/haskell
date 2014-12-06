@@ -55,7 +55,8 @@ par (Concurrent a) (Concurrent b) = Concurrent $ \cont -> Fork (a cont) (b cont)
 -- consider Concurrent as a monad
 instance Monad Concurrent where
     -- Concurrent a >>= \a -> Concurrent b -> Concurrent b
-    (Concurrent f) >>= g = Concurrent $ \cont -> f (\a -> case g a of (Concurrent b) -> b cont)
+    (Concurrent f) >>= g =
+      Concurrent $ \cont -> f (\a -> case g a of (Concurrent b) -> b cont)
     return x = Concurrent (\c -> c x)
 
 
@@ -81,7 +82,6 @@ ex1 = do atom (putStr "Haskell")
          fork (loop $ genRandom 7331) 
          loop $ genRandom 42
          atom (putStrLn "")
-
 
 -- ===================================
 -- Helper Functions
@@ -121,3 +121,11 @@ myex3 = run $ par (put3 "ba") (put3 "di" >> stop) >>
 myex4 = run $ (par (put3 "ba") (put3 "di")) >>
         atom (putStr "\n")
   where put3 = sequence . take 3 . repeat . atom . putStr
+
+myex5 :: Concurrent ()
+myex5 = do fork (atom $ putStrLn "test")
+           atom $ putStrLn "hello"
+
+myex6 :: Concurrent ()
+myex6 = do val <- par (atom $ return "hi") (atom $ return "hello")
+           atom $ putStrLn val

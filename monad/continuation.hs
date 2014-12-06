@@ -32,10 +32,7 @@ square_cps x = \cont -> cont (square x)
 square_cps2 :: Int -> ((Int -> r) -> r)
 square_cps2 x cont = cont (square x)
 
-foo :: Int -> Int
-foo x y = x + y
-
-pythagoras_cps :: Int -> Int -> ((Int -> r) -> r)
+pythagoras_cps :: Int -> Int -> (Int -> r) -> r
 pythagoras_cps x y = \k ->
   square_cps x $ \xSq ->
   square_cps y $ \ySq ->
