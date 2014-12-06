@@ -1,21 +1,7 @@
-module Lab5 where
+module Lab11 where
 
 import Control.Monad
 
-{- 
-A process is represented by the following recursive algebraic data type Action
-that encodes primitive actions that perform a side-effect and then
-return a continuation action, or the concurrent execution of two actions,
-or an action that has terminated.
-
-To suspend a process, we need to grab its "future" and store it away for later use.
-Continuations are an excellent way of implementing this. We can change a function into
-continuation passing style by adding an extra parameter, the continuation,
-that represents the "future" work that needs to be done after this function terminates.
-
-Instead of producing its result directly,
-the function will now apply the continuation to the result. 
--}
 data Action 
     = Atom (IO Action)
     | Fork Action Action
@@ -23,67 +9,53 @@ data Action
 
 data Concurrent a = Concurrent ((a -> Action) -> Action)
 
-{-
-This type can be read as a function that takes as input a continuation function (a -> Action),
-that specifies how to continue once the result of type a of the current computation is available.
-An application f c of this type will call c with its result when it becomes available. 
--}
-
 instance Show Action where
     show (Atom x) = "atom"
     show (Fork x y) = "fork " ++ show x ++ " " ++ show y
     show Stop = "stop"
 
-{-Ex. 0
-To express the connection between an expression of type Concurrent a and one of type Action,
-we define a function
+-- ===================================
+-- Ex. 0
+-- ===================================
 
-action :: Concurrent a -> Action that transforms a ((a -> Action) -> Action)
-
-into an Action that uses Stop :: Action to create the continuation to the Concurrent
-a passed as the first argument to action.
--}
-
--- action' :: ((a -> Action) -> Action) -> Action
--- action' = \a -> Stop
-
+-- Concurrent(\a -> Stop)
 action :: Concurrent a -> Action
-action cont = \a -> cont a
-
+action (Concurrent concur) = concur (\a -> Stop)
 
 -- ===================================
 -- Ex. 1
 -- ===================================
 
 stop :: Concurrent a
-stop = error "You have to implement stop"
-
+stop = Concurrent (\cont -> Stop)
 
 -- ===================================
 -- Ex. 2
 -- ===================================
 
 atom :: IO a -> Concurrent a
-atom = error "You have to implement atom"
-
+atom m = Concurrent $ \cont -> Atom (do a <- m
+                                        return $ cont a)
 
 -- ===================================
 -- Ex. 3
 -- ===================================
 
 fork :: Concurrent a -> Concurrent ()
-fork = error "You have to implement fork"
+fork concur = Concurrent $ \cont -> Fork (action concur) (cont ())
 
 par :: Concurrent a -> Concurrent a -> Concurrent a
-par = error "You have to implement par"
-
+par (Concurrent a) (Concurrent b) = Concurrent $ \cont -> Fork (a cont) (b cont) 
 
 -- ===================================
 -- Ex. 4
 -- ===================================
 
+-- data Concurrent a = Concurrent ((a -> Action) -> Action)
+-- consider Concurrent as a monad
 instance Monad Concurrent where
-    (Concurrent f) >>= g = error "You have to implement >>="
+    -- Concurrent a >>= \a -> Concurrent b -> Concurrent b
+    (Concurrent f) >>= g = Concurrent $ \cont -> f (\a -> case g a of (Concurrent b) -> b cont)
     return x = Concurrent (\c -> c x)
 
 
@@ -92,7 +64,10 @@ instance Monad Concurrent where
 -- ===================================
 
 roundRobin :: [Action] -> IO ()
-roundRobin = error "You have to implement roundRobin"
+roundRobin [] = return ()
+roundRobin (Atom x:xs) = x >>= \ac -> roundRobin (xs ++ [ac])
+roundRobin (Fork x y : xs) = roundRobin (xs ++ [x, y])
+roundRobin (Stop : xs) = roundRobin xs
 
 -- ===================================
 -- Tests
@@ -124,3 +99,25 @@ genRandom 42   = [71, 71, 17, 14, 16, 91, 18, 71, 58, 75]
 loop :: [Int] -> Concurrent ()
 loop xs = mapM_ (atom . putStr . show) xs
 
+-- other examples from forum
+myex0 = run $ (ho >> ho >> ho) >>
+              (hi >> hi >> hi) >> atom (putStr "\n")
+  where ho = atom (putStr "ho")
+        hi = atom (putStr "hi")
+
+myex1 = run $ fork (ho >> ho >> ho) >>
+              (hi >> hi >> hi) >> atom (putStr "\n")
+  where ho = atom (putStr "ho")
+        hi = atom (putStr "hi")
+        
+myex2 = run $ fork (put3 "ba") >> fork (put3 "di") >>
+        put3 "bu" >> atom (putStr "\n")
+  where put3 = sequence . take 3 . repeat . atom . putStr
+        
+myex3 = run $ par (put3 "ba") (put3 "di" >> stop) >>
+        atom (putStr "\n")
+  where put3 = sequence . take 3 . repeat . atom . putStr
+        
+myex4 = run $ (par (put3 "ba") (put3 "di")) >>
+        atom (putStr "\n")
+  where put3 = sequence . take 3 . repeat . atom . putStr

@@ -1,8 +1,9 @@
 -- ref : https://www.haskell.org/tutorial/io.html
 
-main :: IO ()
+main :: IO Char 
 main = do c <- getChar
           putChar c
+          return c
 
 getLine' :: IO String
 getLine' = do
