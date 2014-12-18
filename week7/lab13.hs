@@ -18,6 +18,8 @@ children (h :> r) = r
 
 xs = 0 :> [1 :> [2 :> [3 :> [4 :> [], 5 :> []]]], 6 :> [], 7 :> [8 :> [9 :> [10 :> []], 11 :> []], 12 :> [13 :> []]]]
 
+tree = 'x' :> map (flip (:>) []) ['a'..'z']
+
 tree0 = 'x' :> map (flip (:>) []) ['a'..'x']
 ex0 = length $ children tree0
 tree1 = 'x' :> map (\c -> c :> []) ['a'..'A']
@@ -35,6 +37,7 @@ leaves :: Rose a -> Int
 leaves (h :> []) = 1
 leaves (h :> r)  = sum (map leaves r)
 
+tree' = 1 :> map (flip (:>) []) [1..5]
 tree3 = 1 :> map (\c -> c :> []) [1..5]
 ex3 = size tree3
 
@@ -64,16 +67,17 @@ class Monoid m where
   mempty :: m
   mappend :: m -> m -> m
 
+-- newtype Sum a = Sum { getSum :: a } deriving Show
 newtype Sum a = Sum a deriving Show
 newtype Product a = Product a deriving Show
 
 instance Num a => Monoid (Sum a) where
   mempty = Sum 0 
-  mappend x y = Sum ((unSum x) + (unSum y))
+  Sum x `mappend` Sum y = Sum (x + y)
   
 instance Num a => Monoid (Product a) where
-  mempty = Product 1 
-  mappend x y = Product((unProduct x) * (unProduct y))
+  mempty = Product 1
+  Product x `mappend` Product y = Product (x * y)
 
 unSum :: Sum a -> a
 unSum (Sum x) = x
