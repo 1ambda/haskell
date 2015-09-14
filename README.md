@@ -1,6 +1,6 @@
 # Haskell Note
 
-## FP101.x
+## FP101
 
 Introduction to Functional Programming using **Haskell**
 
