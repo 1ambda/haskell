@@ -1,5 +1,9 @@
 # Haskell Note
 
+## LYGGH
+
+[Chapter 1]() - Haskell Basics
+
 ## FP101
 
 Introduction to Functional Programming using **Haskell**
