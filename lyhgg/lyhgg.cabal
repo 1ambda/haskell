@@ -7,3 +7,13 @@ executable lyhgg
   main-is:         Main.hs
   hs-source-dirs:  src
   build-depends:   base
+
+Test-Suite spec
+  Type:                 exitcode-stdio-1.0
+  Default-Language:     Haskell2010
+  Hs-Source-Dirs:       test
+  Ghc-Options:          -Wall
+  Main-Is:              spec.hs
+  Build-Depends:        base
+                      , hspec
+                      , QuickCheck
